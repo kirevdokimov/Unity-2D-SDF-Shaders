@@ -1,6 +1,7 @@
 Shader "Unlit/ShaderA"{
     Properties{    
         _veca ("VectorA", Vector) = (0,0,0,0)
+        _vecb ("VectorB", Vector) = (0,0,0,0)
     }
     
     SubShader{
@@ -13,6 +14,7 @@ Shader "Unlit/ShaderA"{
             
             #include "UnityCG.cginc"
             #include "SDFCircle.cginc"
+            #include "SDFRectangle.cginc"
 
             struct appdata{
                 float4 vertex : POSITION;
@@ -24,6 +26,7 @@ Shader "Unlit/ShaderA"{
             };
             
             float4 _veca;
+            float4 _vecb;
             
             v2f vert (appdata v){
                 v2f o;
@@ -31,10 +34,9 @@ Shader "Unlit/ShaderA"{
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 return o;
             }
-            
             float sdf(float2 position){
-                float circleDist = circle(position - _veca.xy, _veca.z);
-                return circleDist;
+                float r = rectangle(position - _veca.xy, _veca.zw);
+                return step(r, _vecb.x);
             }
             
             fixed4 frag (v2f i) : SV_Target {
